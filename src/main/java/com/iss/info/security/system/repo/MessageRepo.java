@@ -1,7 +1,11 @@
 package com.iss.info.security.system.repo;
 
-import com.iss.info.security.system.model.Message;
+import com.iss.info.security.system.model.PersonMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MessageRepo extends JpaRepository<Message,Integer> {
+import java.util.List;
+
+public interface MessageRepo extends JpaRepository<PersonMessage,Integer> {
+
+    List<PersonMessage> findByToUser(String to);
 }
