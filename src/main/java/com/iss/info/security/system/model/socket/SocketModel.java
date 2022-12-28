@@ -9,6 +9,7 @@ public class SocketModel implements Serializable {
 
     private String methodName;
     private String methodBody;
+    private String mac;
 
     public String getMethodName() {
         return methodName;
@@ -16,6 +17,10 @@ public class SocketModel implements Serializable {
 
     public String getMethodBody() {
         return methodBody;
+    }
+
+    public String getMac(){
+        return mac;
     }
 
     public String toJson(){
@@ -31,6 +36,7 @@ public class SocketModel implements Serializable {
         return "SocketModel{" +
                 "methodName='" + methodName + '\'' +
                 ", methodBody='" + methodBody + '\'' +
+                ", mac='" + mac + '\'' +
                 '}';
     }
 }

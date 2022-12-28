@@ -37,6 +37,14 @@ public class UserService {
         return userRepo.getUserByPhoneNumber(phoneNumber).get();
     }
 
+    public Person getUserById(int userId){
+        return userRepo.getById(userId).get();
+    }
+
+    public String getSymmetricKeyByPhoneNumber(String phoneNumber){
+        return userRepo.findByPhoneNumber(phoneNumber).get().getPerson_sym_key().getSymmetricKey();
+    }
+
     public List<Person> getAllUserChats(int userId){
         return userRepo.findByPersonParentId(userId);
     }

@@ -1,8 +1,10 @@
 package com.iss.info.security.system.handler;
 
+import com.iss.info.security.system.helper.SymmetricEncryptionTools;
 import com.iss.info.security.system.model.PersonMessage;
 import com.iss.info.security.system.model.socket.SocketModel;
 import com.iss.info.security.system.service.SocketService;
+import com.iss.info.security.system.service.UserService;
 import com.iss.info.security.system.socket.ClientSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import static com.iss.info.security.system.app.Constant.CHAT_SEND;
 
 @Component
@@ -20,6 +25,9 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 
     @Autowired
     SocketService socketService;
+
+    @Autowired
+    UserService userService;
 
     ClientSocket clientSocket;
 
@@ -47,11 +55,12 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         super.handleTextMessage(session, message);
         logger.info("Received Message  :" + SocketModel.fromJson(message));
-        filterMessageAndSend(SocketModel.fromJson(message));
+        if(verified(SocketModel.fromJson(message)))
+            filterMessageAndSend(SocketModel.fromJson(message));
     }
 
 
-    private void filterMessageAndSend(SocketModel socketModel){
+    private void filterMessageAndSend(SocketModel socketModel) throws Exception {
         switch (socketModel.getMethodName().toUpperCase()){
            case  CHAT_SEND: {
                PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
@@ -60,5 +69,12 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
            }
             default:break;
         }
+    }
+
+    private boolean verified(SocketModel socketModel) throws NoSuchAlgorithmException, InvalidKeyException {
+        PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
+        return socketModel.getMac()
+                .equals(SymmetricEncryptionTools.getMac(userService.getSymmetricKeyByPhoneNumber(personMessage.getFromUser())
+                , personMessage.getContent()));
     }
 }

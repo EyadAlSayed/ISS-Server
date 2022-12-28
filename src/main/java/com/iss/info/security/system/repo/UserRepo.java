@@ -12,5 +12,7 @@ public interface UserRepo extends JpaRepository<Person,Long> {
 
     Optional<Person> getUserByPhoneNumber(String phoneNumber);
 
+    Optional<Person> getById(int userId);
+
     List<Person> findByPersonParentId(int userParentId);
 }

@@ -31,6 +31,9 @@ public class Person {
     @OneToOne(mappedBy = "person")
     PersonIP personIp;
 
+    @OneToOne(mappedBy = "person")
+    PersonSymmetricKey person_sym_key;
+
     public Person() {
     }
 
@@ -74,6 +77,8 @@ public class Person {
         this.password = password;
     }
 
+
+
     public Set<Person> getContacts() {
         return contacts;
     }
@@ -100,6 +105,10 @@ public class Person {
 
     public PersonIP getUserIp() {
         return personIp;
+    }
+
+    public PersonSymmetricKey getPerson_sym_key() {
+        return person_sym_key;
     }
 
     public void setUserIp(PersonIP personIp) {
