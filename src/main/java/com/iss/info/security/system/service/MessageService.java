@@ -24,8 +24,9 @@ public class MessageService {
         messageRepo.save(personMessage);
     }
 
-    public List<PersonMessage> getAllMessagesByPhoneNumber(String phoneNumber){
-        return messageRepo.findByToUser(phoneNumber);
+    public List<PersonMessage> getAllMessagesByPhoneNumber(String ip, String phoneNumber){
+        String senderPhoneNumber = userService.getPhoneNumberByUserIp(ip);
+        return messageRepo.findByFromUserAndToUser(senderPhoneNumber,phoneNumber);
     }
 
 

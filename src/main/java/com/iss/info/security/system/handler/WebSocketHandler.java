@@ -19,12 +19,12 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 import static com.iss.info.security.system.app.Constant.CHAT_SEND;
+import static com.iss.info.security.system.app.Constant.*;
 
 @Component
 public class WebSocketHandler extends AbstractWebSocketHandler {
 
-    @Autowired
-    SocketService socketService;
+
 
     @Autowired
     UserService userService;
@@ -34,8 +34,6 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     public WebSocketHandler(ClientSocket clientSocket) {
         this.clientSocket = clientSocket;
     }
-
-
 
     private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
 
@@ -57,6 +55,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         logger.info("Received Message  :" + SocketModel.fromJson(message));
         if(verified(SocketModel.fromJson(message)))
             filterMessageAndSend(SocketModel.fromJson(message));
+        clientSocket.filterAndForwardMessage(SocketModel.fromJson(message),session.getRemoteAddress().getHostName());
     }
 
 
@@ -77,4 +76,5 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
                 .equals(SymmetricEncryptionTools.getMac(userService.getSymmetricKeyByPhoneNumber(personMessage.getFromUser())
                 , personMessage.getContent()));
     }
+
 }
