@@ -2,8 +2,10 @@ package com.iss.info.security.system.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -84,22 +86,24 @@ public class Person implements Serializable {
         this.password = password;
     }
 
-
-
-    public Set<Person> getContacts() {
-        return contacts;
+    public Set<PersonContact> getPersonContacts() {
+        return personContacts;
     }
 
-    public void setContacts(Set<Person> contacts) {
-        this.contacts = contacts;
+    public void setPersonContacts(Set<PersonContact> personContacts) {
+        this.personContacts = personContacts;
     }
 
-    public Person getPersonParent() {
-        return personParent;
+    public List<PersonMessage> getPersonMessages() {
+        return personMessages;
     }
 
-    public void setPersonParent(Person personParent) {
-        this.personParent = personParent;
+    public void setPersonMessages(List<PersonMessage> personMessages) {
+        this.personMessages = personMessages;
+    }
+
+    public void setPerson_sym_key(PersonSymmetricKey person_sym_key) {
+        this.person_sym_key = person_sym_key;
     }
 
     public List<PersonMessage> getUserMessages() {
@@ -115,6 +119,8 @@ public class Person implements Serializable {
     }
 
     public void setPersonIp(PersonIP personIp) {
+        this.personIp = personIp;
+    }
     public PersonSymmetricKey getPerson_sym_key() {
         return person_sym_key;
     }

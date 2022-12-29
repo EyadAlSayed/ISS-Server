@@ -9,12 +9,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserRepo extends JpaRepository<Person,Long> {
+public interface UserRepo extends JpaRepository<Person,Integer> {
 
     Optional<Person> findByPhoneNumber(String phoneNumber);
 
     Optional<Person> getUserByPhoneNumber(String phoneNumber);
-
 
     Optional<Person> findByPhoneNumberAndPassword(String phoneNumber,String password);
 

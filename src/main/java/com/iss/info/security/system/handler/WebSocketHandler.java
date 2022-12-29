@@ -53,28 +53,8 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         super.handleTextMessage(session, message);
         logger.info("Received Message  :" + SocketModel.fromJson(message));
-        if(verified(SocketModel.fromJson(message)))
-            filterMessageAndSend(SocketModel.fromJson(message));
+
         clientSocket.filterAndForwardMessage(SocketModel.fromJson(message),session.getRemoteAddress().getHostName());
-    }
-
-
-    private void filterMessageAndSend(SocketModel socketModel) throws Exception {
-        switch (socketModel.getMethodName().toUpperCase()){
-           case  CHAT_SEND: {
-               PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
-               clientSocket.sendTextMessageTo(socketService.getChatIpByPhoneNumber(personMessage.getToUser()), personMessage);
-               break;
-           }
-            default:break;
-        }
-    }
-
-    private boolean verified(SocketModel socketModel) throws NoSuchAlgorithmException, InvalidKeyException {
-        PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
-        return socketModel.getMac()
-                .equals(SymmetricEncryptionTools.getMac(userService.getSymmetricKeyByPhoneNumber(personMessage.getFromUser())
-                , personMessage.getContent()));
     }
 
 }

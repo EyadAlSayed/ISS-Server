@@ -5,7 +5,6 @@ import com.iss.info.security.system.model.PersonIP;
 import com.iss.info.security.system.model.req.LoginModel;
 import com.iss.info.security.system.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,16 +47,13 @@ public class UserService {
     }
 
     public Person getUserById(int userId){
-        return userRepo.getById(userId).get();
+        return userRepo.findById(userId).get();
     }
 
     public String getSymmetricKeyByPhoneNumber(String phoneNumber){
         return userRepo.findByPhoneNumber(phoneNumber).get().getPerson_sym_key().getSymmetricKey();
     }
 
-    public List<Person> getAllUserChats(int userId){
-        return userRepo.findByPersonParentId(userId);
-    }
 
     public int updateUserIp(String phoneNumber, String userIp) {
         Person person = getUserByPhoneNumber(phoneNumber);

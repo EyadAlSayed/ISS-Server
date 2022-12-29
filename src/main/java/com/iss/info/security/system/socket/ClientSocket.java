@@ -1,13 +1,19 @@
 package com.iss.info.security.system.socket;
 
+import com.iss.info.security.system.helper.SymmetricEncryptionTools;
 import com.iss.info.security.system.model.PersonMessage;
+import com.iss.info.security.system.model.socket.SocketModel;
 import com.iss.info.security.system.service.MessageService;
+import com.iss.info.security.system.service.SocketService;
+import com.iss.info.security.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +34,7 @@ public class ClientSocket {
 
     @Autowired
     MessageService messageService;
+
     public List<WebSocketSession> getSessions() {
         return sessions;
     }
@@ -41,25 +48,30 @@ public class ClientSocket {
     }
 
 
-    public void filterAndForwardMessage(SocketModel socketModel, String userIp){
-        switch (socketModel.getMethodName().toUpperCase()){
-            case  CHAT_SEND:
+    public void filterAndForwardMessage(SocketModel socketModel, String userIp) {
+        switch (socketModel.getMethodName().toUpperCase()) {
+            case CHAT_SEND:
             case CHAT_RECEIVED: {
+//                sendVerifiedMessage(socketModel);
                 sendAndReceiveFilter(socketModel);
                 break;
             }
-            case REG_IP:{
+            case REG_IP: {
                 String phoneNumber = socketModel.getMethodBody();
-                socketService.updateUserIp(phoneNumber,userIp);
+                socketService.updateUserIp(phoneNumber, userIp);
             }
-            default:break;
+            default:
+                break;
         }
     }
+
 
 
     public void sendAndReceiveFilter(SocketModel socketModel) {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
         String receiverIp = personMessage.getUser().getPersonIp().getIp();
+    }
+
     public void sendTextMessageTo(String receiverIp, PersonMessage personMessage) throws Exception {
         WebSocketSession session = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
         if (session != null) {
@@ -78,13 +90,19 @@ public class ClientSocket {
         personMessage.setContent(SymmetricEncryptionTools.do_AESDecryption(SymmetricEncryptionTools.hexStringToByteArray(personMessage.getContent())
                 , SymmetricEncryptionTools.retrieveSecretKey(userService.getSymmetricKeyByPhoneNumber(personMessage.getFromUser()))));
         messageService.saveMessage(personMessage);
-            try {
-                messageService.saveMessage(personMessage);
-                session.sendMessage(new TextMessage(socketModel.toJson()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
+    private void sendVerifiedMessage(SocketModel socketModel){
+        try {
+            if (verified(socketModel)) sendAndReceiveFilter(socketModel);
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private boolean verified(SocketModel socketModel) throws NoSuchAlgorithmException, InvalidKeyException {
+        PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
+        return socketModel.getMac()
+                .equals(SymmetricEncryptionTools.getMac(userService.getSymmetricKeyByPhoneNumber(personMessage.getFromUser())
+                        , personMessage.getContent()));
+    }
 }
