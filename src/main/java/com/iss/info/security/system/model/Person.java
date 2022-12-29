@@ -1,15 +1,19 @@
 package com.iss.info.security.system.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "person")
-public class Person {
+public class Person implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,16 +23,19 @@ public class Person {
 
     private String password;
 
-    @OneToMany(mappedBy = "personParent")
-    private Set<Person> contacts;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Person personParent;
+    @OneToMany(mappedBy = "person")
+    @JsonIgnoreProperties(value = "person", allowSetters = true)
+    @JsonManagedReference
+    private Set<PersonContact> personContacts;
 
     @OneToMany(mappedBy = "person")
     @JsonIgnoreProperties(value = "person", allowSetters = true)
+    @JsonManagedReference
     private List<PersonMessage> personMessages;
 
-    @OneToOne(mappedBy = "person")
+    @OneToOne(cascade = CascadeType.ALL,mappedBy = "person")
+    @JsonIgnoreProperties(value = "person")
+            @JsonManagedReference
     PersonIP personIp;
 
     public Person() {
@@ -41,6 +48,10 @@ public class Person {
         this.password = password;
     }
 
+    public Person(String phoneNumber, String password) {
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+    }
 
     public int getId() {
         return id;
@@ -74,22 +85,6 @@ public class Person {
         this.password = password;
     }
 
-    public Set<Person> getContacts() {
-        return contacts;
-    }
-
-    public void setContacts(Set<Person> contacts) {
-        this.contacts = contacts;
-    }
-
-    public Person getPersonParent() {
-        return personParent;
-    }
-
-    public void setPersonParent(Person personParent) {
-        this.personParent = personParent;
-    }
-
     public List<PersonMessage> getUserMessages() {
         return personMessages;
     }
@@ -98,11 +93,11 @@ public class Person {
         this.personMessages = personMessages;
     }
 
-    public PersonIP getUserIp() {
+    public PersonIP getPersonIp() {
         return personIp;
     }
 
-    public void setUserIp(PersonIP personIp) {
+    public void setPersonIp(PersonIP personIp) {
         this.personIp = personIp;
     }
 

@@ -1,6 +1,9 @@
 package com.iss.info.security.system.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.google.gson.Gson;
 
 import javax.persistence.*;
@@ -21,9 +24,11 @@ public class PersonMessage {
 
     private int type;
 
-    @ManyToOne(cascade= CascadeType.ALL)
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "person_id",nullable = false, referencedColumnName = "id")
     @JsonIgnoreProperties(value = "personMessages", allowSetters = true)
+    @JsonBackReference
     private Person person;
 
     public PersonMessage() {

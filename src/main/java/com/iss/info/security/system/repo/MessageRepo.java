@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface MessageRepo extends JpaRepository<PersonMessage,Integer> {
 
-    List<PersonMessage> findByToUser(String to);
+    List<PersonMessage> findByFromUserAndToUser(String fromUser,String toUser);
 }

@@ -13,21 +13,18 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
-import static com.iss.info.security.system.app.Constant.CHAT_SEND;
+import static com.iss.info.security.system.app.Constant.*;
 
 @Component
 public class WebSocketHandler extends AbstractWebSocketHandler {
 
-    @Autowired
-    SocketService socketService;
+
 
     ClientSocket clientSocket;
 
     public WebSocketHandler(ClientSocket clientSocket) {
         this.clientSocket = clientSocket;
     }
-
-
 
     private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
 
@@ -47,18 +44,9 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         super.handleTextMessage(session, message);
         logger.info("Received Message  :" + SocketModel.fromJson(message));
-        filterMessageAndSend(SocketModel.fromJson(message));
+        clientSocket.filterAndForwardMessage(SocketModel.fromJson(message),session.getRemoteAddress().getHostName());
     }
 
 
-    private void filterMessageAndSend(SocketModel socketModel){
-        switch (socketModel.getMethodName().toUpperCase()){
-           case  CHAT_SEND: {
-               PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
-               clientSocket.sendTextMessageTo(socketService.getChatIpByPhoneNumber(personMessage.getToUser()), personMessage);
-               break;
-           }
-            default:break;
-        }
-    }
+
 }
