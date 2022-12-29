@@ -71,8 +71,6 @@ public class PersonMessage {
         this.toUser = toUser;
     }
 
-
-
     public int getType() {
         return type;
     }
