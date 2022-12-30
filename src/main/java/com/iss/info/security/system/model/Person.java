@@ -14,7 +14,9 @@ public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String name;
+
     private String phoneNumber;
 
     private String password;
@@ -31,8 +33,10 @@ public class Person {
     @OneToOne(mappedBy = "person")
     PersonIP personIp;
 
-    public Person() {
-    }
+    @OneToOne(mappedBy = "person")
+    PersonSessionKey personSessionKey;
+
+    public Person() {}
 
     public Person(int id, String name, String phoneNumber, String password) {
         this.id = id;
@@ -41,6 +45,9 @@ public class Person {
         this.password = password;
     }
 
+    public PersonSessionKey getPersonSessionKey() {
+        return personSessionKey;
+    }
 
     public int getId() {
         return id;

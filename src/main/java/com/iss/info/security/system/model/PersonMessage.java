@@ -1,7 +1,9 @@
 package com.iss.info.security.system.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import com.google.gson.Gson;
+
 
 import javax.persistence.*;
 

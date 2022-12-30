@@ -18,6 +18,7 @@ public class SocketModel implements Serializable {
         return methodBody;
     }
 
+
     public String toJson(){
         return new Gson().toJson(this);
     }
