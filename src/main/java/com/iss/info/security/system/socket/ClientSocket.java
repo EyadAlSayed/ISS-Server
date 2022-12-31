@@ -90,14 +90,6 @@ public class ClientSocket {
 
 
 
-
-
-
-
-
-
-
-
     private void sendVerifiedMessage(SocketModel socketModel) {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
         Person person = personService.getPersonByPhoneNumber(personMessage.getFromUser());

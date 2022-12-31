@@ -23,8 +23,8 @@ public class AuthController {
     PersonService personService;
 
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<?> signUp( @RequestBody Person person, HttpServletRequest httpServletRequest) {
-        person.setPersonIp(new PersonIP(0,httpServletRequest.getRemoteAddr()));
+    private ResponseEntity<?> signUp(@RequestBody Person person, HttpServletRequest httpServletRequest) {
+        person.setPersonIp(new PersonIP(0, httpServletRequest.getRemoteAddr()));
         personService.create(person);
         return ResponseEntity.ok("successfully");
     }
@@ -33,9 +33,8 @@ public class AuthController {
     private ResponseEntity<LoginModel> login(@RequestBody LoginModel loginModel, HttpServletRequest httpServletRequest) {
         boolean isOk = personService.isRegistered(loginModel);
         if (isOk) {
-           int userId = personService.updatePersonIp(loginModel.getPhoneNumber(), httpServletRequest.getRemoteAddr());
-
-            return new ResponseEntity<>(new LoginModel(userId,loginModel.getPhoneNumber(),loginModel.getPassword()), HttpStatus.OK);
+            int userId = personService.updatePersonIp(loginModel.getPhoneNumber(), httpServletRequest.getRemoteAddr());
+            return new ResponseEntity<>(new LoginModel(userId, loginModel.getPhoneNumber(), loginModel.getPassword()), HttpStatus.OK);
         } else return new ResponseEntity<>(new LoginModel(), HttpStatus.BAD_REQUEST);
     }
 }
