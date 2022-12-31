@@ -23,8 +23,9 @@ public class AuthController {
     PersonService personService;
 
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<?> signUp( @RequestBody Person person, HttpServletRequest httpServletRequest) {
+    private ResponseEntity<?> signUp(@RequestParam("key") String key,@RequestBody Person person, HttpServletRequest httpServletRequest) {
         person.setPersonIp(new PersonIP(0,httpServletRequest.getRemoteAddr()));
+        person.setPersonSymKey(new PersonSymmetricKey(0,key,person));
         personService.create(person);
         return ResponseEntity.ok("successfully");
     }
