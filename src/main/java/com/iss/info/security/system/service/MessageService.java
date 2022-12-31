@@ -16,16 +16,16 @@ public class MessageService {
     private MessageRepo messageRepo;
 
     @Autowired
-    private UserService userService;
+    private PersonService personService;
 
     public void saveMessage(PersonMessage personMessage) {
-        Person person = userService.getUserByPhoneNumber(personMessage.getFromUser());
-//        personMessage.setUser(person);
+        Person person = personService.getPersonByPhoneNumber(personMessage.getFromUser());
+        personMessage.setPerson(person);
         messageRepo.save(personMessage);
     }
 
     public List<PersonMessage> getAllMessagesByPhoneNumber(String ip, String phoneNumber){
-        String senderPhoneNumber = userService.getPhoneNumberByUserIp(ip);
+        String senderPhoneNumber = personService.getPhoneNumberByUserIp(ip);
         return messageRepo.findByFromUserAndToUser(senderPhoneNumber,phoneNumber);
     }
 

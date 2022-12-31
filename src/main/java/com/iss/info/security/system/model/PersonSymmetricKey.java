@@ -16,6 +16,15 @@ public class PersonSymmetricKey {
     @JoinColumn(name = "person_sym_key")
     Person person;
 
+    public PersonSymmetricKey() {
+    }
+
+    public PersonSymmetricKey(int id, String symmetricKey, Person person) {
+        this.id = id;
+        this.symmetricKey = symmetricKey;
+        this.person = person;
+    }
+
     public int getId() {
         return id;
     }

@@ -17,27 +17,28 @@ public class Person implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
+    @Column(unique = true)
     private String phoneNumber;
 
     private String password;
 
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person",cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = "person", allowSetters = true)
     @JsonManagedReference
     private Set<PersonContact> personContacts;
 
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person",cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = "person", allowSetters = true)
     @JsonManagedReference
     private List<PersonMessage> personMessages;
 
-    @OneToOne(cascade = CascadeType.ALL,mappedBy = "person")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "person")
     @JsonIgnoreProperties(value = "person")
-            @JsonManagedReference
     PersonIP personIp;
 
-    @OneToOne(mappedBy = "person")
-    PersonSymmetricKey person_sym_key;
+    @OneToOne(mappedBy = "person",cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = "person")
+    PersonSymmetricKey personSymKey;
 
     public Person() {
     }
@@ -102,9 +103,6 @@ public class Person implements Serializable {
         this.personMessages = personMessages;
     }
 
-    public void setPerson_sym_key(PersonSymmetricKey person_sym_key) {
-        this.person_sym_key = person_sym_key;
-    }
 
     public List<PersonMessage> getUserMessages() {
         return personMessages;
@@ -121,8 +119,13 @@ public class Person implements Serializable {
     public void setPersonIp(PersonIP personIp) {
         this.personIp = personIp;
     }
-    public PersonSymmetricKey getPerson_sym_key() {
-        return person_sym_key;
+
+    public PersonSymmetricKey getPersonSymKey() {
+        return personSymKey;
+    }
+
+    public void setPersonSymKey(PersonSymmetricKey personSymKey) {
+        this.personSymKey = personSymKey;
     }
 
     public void setUserIp(PersonIP personIp) {

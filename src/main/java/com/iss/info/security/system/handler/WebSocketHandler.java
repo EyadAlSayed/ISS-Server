@@ -1,10 +1,7 @@
 package com.iss.info.security.system.handler;
 
-import com.iss.info.security.system.helper.SymmetricEncryptionTools;
-import com.iss.info.security.system.model.PersonMessage;
 import com.iss.info.security.system.model.socket.SocketModel;
-import com.iss.info.security.system.service.SocketService;
-import com.iss.info.security.system.service.UserService;
+import com.iss.info.security.system.service.PersonService;
 import com.iss.info.security.system.socket.ClientSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,19 +12,13 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
-import static com.iss.info.security.system.app.Constant.CHAT_SEND;
-import static com.iss.info.security.system.app.Constant.*;
-
 @Component
 public class WebSocketHandler extends AbstractWebSocketHandler {
 
 
 
     @Autowired
-    UserService userService;
+    PersonService personService;
 
     ClientSocket clientSocket;
 
@@ -53,7 +44,6 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         super.handleTextMessage(session, message);
         logger.info("Received Message  :" + SocketModel.fromJson(message));
-
         clientSocket.filterAndForwardMessage(SocketModel.fromJson(message),session.getRemoteAddress().getHostName());
     }
 

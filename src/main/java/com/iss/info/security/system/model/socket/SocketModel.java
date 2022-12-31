@@ -11,6 +11,18 @@ public class SocketModel implements Serializable {
     private String methodBody;
     private String mac;
 
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public void setMethodBody(String methodBody) {
+        this.methodBody = methodBody;
+    }
+
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
+
     public String getMethodName() {
         return methodName;
     }

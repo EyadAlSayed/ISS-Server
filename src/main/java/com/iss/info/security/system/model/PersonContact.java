@@ -14,14 +14,17 @@ public class PersonContact {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     String name;
+
+    @Column(unique = true)
     String phoneNumber;
 
-    @JsonIgnore
+
     @ManyToOne
     @JoinColumn(name = "person_id",nullable = false, referencedColumnName = "id")
     @JsonIgnoreProperties(value = "personContacts", allowSetters = true)
     @JsonBackReference
     private Person person;
+
     public PersonContact() {
     }
 
@@ -53,5 +56,13 @@ public class PersonContact {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 }
