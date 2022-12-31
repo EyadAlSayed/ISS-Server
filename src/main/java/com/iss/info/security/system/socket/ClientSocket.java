@@ -105,8 +105,8 @@ public class ClientSocket {
 
     private void sendVerifiedMessage(SocketModel socketModel) {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
-        Person person = personService.getPersonByPhoneNumber(personMessage.getFromUser());
-        String receiverIp = person.getPersonIp().getIp();   //fixme: this is the sender's ip. is this correct??
+        Person person = personService.getPersonByPhoneNumber(personMessage.getToUser());
+        String receiverIp = person.getPersonIp().getIp();
         WebSocketSession session = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
         try {
             if (verified(socketModel)) sendTextEncryptedMessage(socketModel, session);
