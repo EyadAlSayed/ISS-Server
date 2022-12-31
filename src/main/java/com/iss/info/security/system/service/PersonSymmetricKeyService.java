@@ -14,4 +14,8 @@ public class PersonSymmetricKeyService {
     public void create(PersonSymmetricKey personSymmetricKey){
         personSymKeyRepo.save(personSymmetricKey);
     }
+
+    public String getSymmetricKeyByUserId(int userId){
+        return personSymKeyRepo.getSymmetricKeyByUserId(userId).get().getSymmetricKey();
+    }
 }

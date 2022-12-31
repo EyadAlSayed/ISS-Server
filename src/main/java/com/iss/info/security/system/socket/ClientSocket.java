@@ -5,6 +5,7 @@ import com.iss.info.security.system.model.Person;
 import com.iss.info.security.system.model.PersonMessage;
 import com.iss.info.security.system.model.socket.SocketModel;
 import com.iss.info.security.system.service.MessageService;
+import com.iss.info.security.system.service.PersonSymmetricKeyService;
 import com.iss.info.security.system.service.SocketService;
 import com.iss.info.security.system.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.iss.info.security.system.app.Constant.*;
+import static com.iss.info.security.system.helper.SymmetricEncryptionTools.*;
 
 @Component("clientSocket")
 public class ClientSocket {
@@ -31,6 +33,9 @@ public class ClientSocket {
 
     @Autowired
     PersonService personService;
+
+    @Autowired
+    PersonSymmetricKeyService personSymmetricKeyService;
 
     @Autowired
     MessageService messageService;
@@ -101,7 +106,7 @@ public class ClientSocket {
     private void sendVerifiedMessage(SocketModel socketModel) {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
         Person person = personService.getPersonByPhoneNumber(personMessage.getFromUser());
-        String receiverIp = person.getPersonIp().getIp();
+        String receiverIp = person.getPersonIp().getIp();   //fixme: this is the sender's ip. is this correct??
         WebSocketSession session = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
         try {
             if (verified(socketModel)) sendTextEncryptedMessage(socketModel, session);
@@ -123,7 +128,7 @@ public class ClientSocket {
     private void sendEncryptedMessage(WebSocketSession session, SocketModel socketModel) throws Exception {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
         String decryptedMessage = decryptionMessage(personMessage);
-        personMessage.setContent(SymmetricEncryptionTools.convertByteToHexadecimal(SymmetricEncryptionTools.do_AESEncryption(decryptedMessage
+        personMessage.setContent(SymmetricEncryptionTools.convertByteToHexadecimal(do_AESEncryption(decryptedMessage
                 , SymmetricEncryptionTools.retrieveSecretKey(personService.getSymmetricKeyByPhoneNumber(personMessage.getToUser())))));
         socketModel.setMethodBody(personMessage.toJson());
         session.sendMessage(new TextMessage(socketModel.toJson()));
@@ -137,7 +142,10 @@ public class ClientSocket {
             return "";
         }
     }
-    private void saveDecryptedSentMessage(PersonMessage personMessage) {
+    private void saveDecryptedSentMessage(PersonMessage personMessage) throws Exception {
+        personMessage.setContent(do_AESDecryption(hexStringToByteArray(personMessage.getContent()),
+                retrieveSecretKey(personSymmetricKeyService.getSymmetricKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()))));
+        //personMessage.setPerson(personService.getPersonByPhoneNumber(personMessage.getFromUser()));
         messageService.saveMessage(personMessage);
     }
 

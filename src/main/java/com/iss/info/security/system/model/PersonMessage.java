@@ -1,7 +1,6 @@
 package com.iss.info.security.system.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.Gson;
 
@@ -22,8 +21,6 @@ public class PersonMessage {
     private String toUser;
 
     private String sender;
-
-    private String mac;
 
     @ManyToOne
     @JoinColumn(name = "person_id", nullable = false, referencedColumnName = "id")
