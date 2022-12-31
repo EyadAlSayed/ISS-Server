@@ -30,7 +30,7 @@ public class UserController {
 
     @GetMapping("/test")
     public ResponseEntity<?> getTest() {
-        return ResponseEntity.ok(personService.getPersonByPhoneNumber("0991423014"));
+        return ResponseEntity.ok(messageService.findByFromUserAndToUser("0991423014","0991423014"));
     }
 
     @GetMapping("/getUserByPhoneNumber")

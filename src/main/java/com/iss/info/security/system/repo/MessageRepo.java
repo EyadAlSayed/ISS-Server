@@ -9,10 +9,5 @@ import java.util.List;
 
 public interface MessageRepo extends JpaRepository<PersonMessage, Integer> {
 
-    @Query("SELECT pm From PersonMessage pm " +
-            "WHERE  pm.fromUser =:fromUser " +
-            "OR pm.fromUser =:toUser  " +
-            "AND  pm.toUser =:toUser " +
-            "pm.toUser =:fromUser ")
     List<PersonMessage> findByFromUserAndToUser(@Param("fromUser") String fromUser, @Param("toUser") String toUser);
 }

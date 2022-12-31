@@ -29,5 +29,9 @@ public class MessageService {
         return messageRepo.findByFromUserAndToUser(senderPhoneNumber,phoneNumber);
     }
 
+    public List<PersonMessage> findByFromUserAndToUser(String one,String two){
+        return messageRepo.findByFromUserAndToUser(one,two);
+    }
+
 
 }
