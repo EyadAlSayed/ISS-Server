@@ -2,37 +2,48 @@ package com.iss.info.security.system.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "person")
-public class Person {
+public class Person implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
+    @Column(unique = true)
 
     private String phoneNumber;
 
     private String password;
 
-    @OneToMany(mappedBy = "personParent")
-    private Set<Person> contacts;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Person personParent;
-
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person",cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = "person", allowSetters = true)
+    @JsonManagedReference
+    private Set<PersonContact> personContacts;
+
+    @OneToMany(mappedBy = "person",cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = "person", allowSetters = true)
+    @JsonManagedReference
     private List<PersonMessage> personMessages;
 
-    @OneToOne(mappedBy = "person")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "person")
+    @JsonIgnoreProperties(value = "person")
     PersonIP personIp;
 
+    @OneToOne(mappedBy = "person",cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = "person")
+    PersonSymmetricKey personSymKey;
+
+    public Person() {
+    }
     @OneToOne(mappedBy = "person")
     PersonSessionKey personSessionKey;
 
@@ -45,6 +56,10 @@ public class Person {
         this.password = password;
     }
 
+    public Person(String phoneNumber, String password) {
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+    }
     public PersonSessionKey getPersonSessionKey() {
         return personSessionKey;
     }
@@ -81,21 +96,22 @@ public class Person {
         this.password = password;
     }
 
-    public Set<Person> getContacts() {
-        return contacts;
+    public Set<PersonContact> getPersonContacts() {
+        return personContacts;
     }
 
-    public void setContacts(Set<Person> contacts) {
-        this.contacts = contacts;
+    public void setPersonContacts(Set<PersonContact> personContacts) {
+        this.personContacts = personContacts;
     }
 
-    public Person getPersonParent() {
-        return personParent;
+    public List<PersonMessage> getPersonMessages() {
+        return personMessages;
     }
 
-    public void setPersonParent(Person personParent) {
-        this.personParent = personParent;
+    public void setPersonMessages(List<PersonMessage> personMessages) {
+        this.personMessages = personMessages;
     }
+
 
     public List<PersonMessage> getUserMessages() {
         return personMessages;
@@ -105,8 +121,20 @@ public class Person {
         this.personMessages = personMessages;
     }
 
-    public PersonIP getUserIp() {
+    public PersonIP getPersonIp() {
         return personIp;
+    }
+
+    public void setPersonIp(PersonIP personIp) {
+        this.personIp = personIp;
+    }
+
+    public PersonSymmetricKey getPersonSymKey() {
+        return personSymKey;
+    }
+
+    public void setPersonSymKey(PersonSymmetricKey personSymKey) {
+        this.personSymKey = personSymKey;
     }
 
     public void setUserIp(PersonIP personIp) {

@@ -9,6 +9,24 @@ public class SocketModel implements Serializable {
 
     private String methodName;
     private String methodBody;
+    private String mac;
+
+    public SocketModel(String methodName, String methodBody) {
+        this.methodName = methodName;
+        this.methodBody = methodBody;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public void setMethodBody(String methodBody) {
+        this.methodBody = methodBody;
+    }
+
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
 
     public String getMethodName() {
         return methodName;
@@ -18,6 +36,9 @@ public class SocketModel implements Serializable {
         return methodBody;
     }
 
+    public String getMac(){
+        return mac;
+    }
 
     public String toJson(){
         return new Gson().toJson(this);
@@ -32,6 +53,7 @@ public class SocketModel implements Serializable {
         return "SocketModel{" +
                 "methodName='" + methodName + '\'' +
                 ", methodBody='" + methodBody + '\'' +
+                ", mac='" + mac + '\'' +
                 '}';
     }
 }

@@ -4,6 +4,7 @@ import com.iss.info.security.system.model.Person;
 import com.iss.info.security.system.model.PersonMessage;
 import com.iss.info.security.system.model.PersonSessionKey;
 import com.iss.info.security.system.model.socket.SocketModel;
+import com.iss.info.security.system.service.PersonService;
 import com.iss.info.security.system.service.SessionKeyService;
 import com.iss.info.security.system.service.SocketService;
 import com.iss.info.security.system.service.UserService;
@@ -28,8 +29,10 @@ import static com.iss.info.security.system.helper.EncryptionTools.*;
 @Component
 public class WebSocketHandler extends AbstractWebSocketHandler {
 
+
+
     @Autowired
-    SocketService socketService;
+    PersonService personService;
 
     @Autowired
     SessionKeyService sessionKeyService;
@@ -42,8 +45,6 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     public WebSocketHandler(ClientSocket clientSocket) {
         this.clientSocket = clientSocket;
     }
-
-
 
     private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
 
@@ -64,7 +65,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         super.handleTextMessage(session, message);
         logger.info("Received Message  :" + SocketModel.fromJson(message));
-        filterMessageAndSend(SocketModel.fromJson(message));
+        clientSocket.filterAndForwardMessage(SocketModel.fromJson(message),session.getRemoteAddress().getHostName());
     }
 
 
