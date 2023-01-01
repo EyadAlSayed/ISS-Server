@@ -8,8 +8,6 @@ import com.iss.info.security.system.service.MessageService;
 import com.iss.info.security.system.service.PersonSymmetricKeyService;
 import com.iss.info.security.system.service.SocketService;
 import com.iss.info.security.system.service.PersonService;
-import com.iss.info.security.system.service.SessionKeyService;
-import com.iss.info.security.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -24,21 +22,11 @@ import java.util.List;
 import static com.iss.info.security.system.app.Constant.*;
 import static com.iss.info.security.system.helper.SymmetricEncryptionTools.*;
 
-import static com.iss.info.security.system.helper.EncryptionConverters.convertByteToHexadecimal;
-import static com.iss.info.security.system.helper.EncryptionConverters.retrieveSymmetricSecretKey;
-import static com.iss.info.security.system.helper.EncryptionTools.do_AESEncryption;
-
 @Component("clientSocket")
 public class ClientSocket {
     @Autowired
     SocketService socketService;
     private final List<WebSocketSession> sessions;
-
-    @Autowired
-    SessionKeyService sessionKeyService;
-
-    @Autowired
-    UserService userService;
 
     public ClientSocket() {
         sessions = new ArrayList<>();
@@ -100,19 +88,11 @@ public class ClientSocket {
     }
 
     public void sendTextMessageTo(String receiverIp, SocketModel socketModel) throws Exception {
-        PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
         WebSocketSession session = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
         if (session != null) {
-            try {
-                messageService.saveMessage(personMessage);
-                session.sendMessage(new TextMessage(getEncryptedMessage(personMessage)));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
             session.sendMessage(new TextMessage(socketModel.toJson()));
         }
-
+    }
 
 
 
@@ -187,9 +167,4 @@ public class ClientSocket {
                 .equals(SymmetricEncryptionTools.getMac(personService.getSymmetricKeyByPhoneNumber(personMessage.getFromUser())
                         , personMessage.getContent()));
     }
-
-    private String getEncryptedMessage(PersonMessage personMessage) throws Exception {
-        return convertByteToHexadecimal(do_AESEncryption(personMessage.getContent(), retrieveSymmetricSecretKey(sessionKeyService.getSessionKeyByUserId(userService.getUserByPhoneNumber(personMessage.getToUser()).getId()))));
-    }
-
 }
