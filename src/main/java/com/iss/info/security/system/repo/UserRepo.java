@@ -13,8 +13,6 @@ public interface UserRepo extends JpaRepository<Person, Long> {
 
     Optional<Person> getUserByPhoneNumber(String phoneNumber);
 
-    List<Person> findByPersonParentId(int userParentId);
-
     @Query("SELECT p FROM Person p JOIN PersonIP ip WHERE p.personIp.id = ip.id" +
             " AND ip.ip = :ipAddress")
     Optional<Person> getUserByIPAddress(String ipAddress);

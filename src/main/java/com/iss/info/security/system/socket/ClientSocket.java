@@ -69,6 +69,11 @@ public class ClientSocket {
                 String phoneNumber = socketModel.getMethodBody();
 //                socketService.updatePersonIp(phoneNumber, userIp);
             }
+
+            case STORING:{
+
+                break;
+            }
             default:
                 break;
         }

@@ -41,9 +41,6 @@ public class UserService {
         return userRepo.getUserByIPAddress(ipAddress).get();
     }
 
-    public List<Person> getAllUserChats(int userId){
-        return userRepo.findByPersonParentId(userId);
-    }
 
     public int updateUserIp(String phoneNumber, String userIp) {
         Person person = getUserByPhoneNumber(phoneNumber);
