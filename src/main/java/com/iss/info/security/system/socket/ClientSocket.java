@@ -120,11 +120,21 @@ public class ClientSocket {
 
         try {
             WebSocketSession senderSession = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(senderIp)).findFirst().orElse(null);
-            senderSession.sendMessage(new TextMessage(new SocketModel(CHAT_RECEIVED_E,"message send").toJson()));
+            senderSession.sendMessage(new TextMessage(new SocketModel(CHAT_RECEIVED_E,encryptMessage(personMessage, "message sent")).toJson()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private String encryptMessage(PersonMessage personMessage, String message){
+        try {
+            return convertByteToHexadecimal(do_AESEncryption(message
+            , retrieveSecretKey(personSymmetricKeyService.getSymmetricKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()))));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void sendTextEncryptedMessage(SocketModel socketModel, WebSocketSession session) {
