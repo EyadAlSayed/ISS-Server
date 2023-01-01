@@ -57,7 +57,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         logger.info("Connection Closed With Device " + session.getRemoteAddress() + " for messages ..");
         clientSocket.removeClientSession(session);
-        //todo: delete session key from db.
+        sessionKeyService.deleteUserSessionKey(userService.getUserByIPAddress(session.getRemoteAddress().getAddress().getHostName()).getId());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
         switch (socketModel.getMethodName().toUpperCase()){
             case CHAT_SEND: {
-                personMessage.setContent(decryptAndReEncryptMessage(personMessage));
+                personMessage.setContent(decryptMessage(personMessage));
                 clientSocket.sendTextMessageTo(socketService.getChatIpByPhoneNumber(personMessage.getToUser()), personMessage);
                 break;
             }
@@ -89,13 +89,11 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         }
     }
 
-    // decrypts the received message using sender's session key,
-    // then re encrypting the message using the receiver's session key.
-    private String decryptAndReEncryptMessage(PersonMessage personMessage) throws Exception {
-        SecretKey senderSessionKey = retrieveSymmetricSecretKey(sessionKeyService.getSessionKeyByUserId(userService.getUserByPhoneNumber(personMessage.getFromUser()).getId()));
-        senderSessionKey = retrieveSymmetricSecretKey(do_RSADecryption(senderSessionKey.getEncoded(), retrievePrivateKey(getServerPrivateKeyFromFile())));
-        String decryptedSentMessage = do_AESDecryption(hexStringToByteArray(personMessage.getContent()), senderSessionKey);
-        return convertByteToHexadecimal(do_AESEncryption(decryptedSentMessage, retrieveSymmetricSecretKey(sessionKeyService.getSessionKeyByUserId(userService.getUserByPhoneNumber(personMessage.getToUser()).getId()))));
+    // decrypts the received message using sender's session key.
+    private String decryptMessage(PersonMessage personMessage) throws Exception {
+        byte[] senderSessionKeyAsBytes = hexStringToByteArray(sessionKeyService.getSessionKeyByUserId(userService.getUserByPhoneNumber(personMessage.getFromUser()).getId()));
+        SecretKey senderSessionKey = retrieveSymmetricSecretKey(do_RSADecryption(senderSessionKeyAsBytes, retrievePrivateKey(getServerPrivateKeyFromFile())));
+        return do_AESDecryption(hexStringToByteArray(personMessage.getContent()), senderSessionKey);
     }
 
     private void addUserSessionKeyToDB(Person person, String encryptedSessionKey) throws Exception {

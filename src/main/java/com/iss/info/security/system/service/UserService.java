@@ -37,6 +37,10 @@ public class UserService {
         return userRepo.getUserByPhoneNumber(phoneNumber).get();
     }
 
+    public Person getUserByIPAddress(String ipAddress){
+        return userRepo.getUserByIPAddress(ipAddress).get();
+    }
+
     public List<Person> getAllUserChats(int userId){
         return userRepo.findByPersonParentId(userId);
     }
