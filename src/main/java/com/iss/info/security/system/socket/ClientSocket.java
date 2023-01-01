@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ public class ClientSocket {
             }
             case REG_IP: {
                 String phoneNumber = socketModel.getMethodBody();
-                socketService.updatePersonIp(phoneNumber, userIp);
+//                socketService.updatePersonIp(phoneNumber, userIp);
             }
             default:
                 break;
@@ -105,14 +106,25 @@ public class ClientSocket {
 
     private void sendVerifiedMessage(SocketModel socketModel) {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
-        Person person = personService.getPersonByPhoneNumber(personMessage.getToUser());
-        String receiverIp = person.getPersonIp().getIp();
-        WebSocketSession session = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
+        Person toPerson = personService.getPersonByPhoneNumber(personMessage.getToUser());
+        Person fromPerson = personService.getPersonByPhoneNumber(personMessage.getFromUser());
+        String receiverIp = toPerson.getPersonIp().getIp();
+        String senderIp = fromPerson.getPersonIp().getIp();
+
+        WebSocketSession receiverSession = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
         try {
-            if (verified(socketModel)) sendTextEncryptedMessage(socketModel, session);
+            if (verified(socketModel)) sendTextEncryptedMessage(socketModel, receiverSession);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
+
+        try {
+            WebSocketSession senderSession = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(senderIp)).findFirst().orElse(null);
+            senderSession.sendMessage(new TextMessage(new SocketModel(CHAT_RECEIVED_E,"message send").toJson()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void sendTextEncryptedMessage(SocketModel socketModel, WebSocketSession session) {

@@ -11,4 +11,6 @@ public class Constant {
 
     public final static String CHAT_RECEIVED = "CHAT_REC";
     public final static String CHAT_RECEIVED_E = "CHAT_REC_E";
+
+
 }
