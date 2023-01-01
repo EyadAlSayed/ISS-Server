@@ -21,7 +21,7 @@ public class UserService {
 
 
     public String getUserIpByPhoneNumber(String phoneNumber) {
-       return userRepo.findByPhoneNumber(phoneNumber).get().getUserIp().getIp();
+       return userRepo.findByPhoneNumber(phoneNumber).get().getPersonIp().getIp();
     }
 
     public boolean isRegistered(LoginModel loginInfo) {
@@ -47,7 +47,7 @@ public class UserService {
 
     public int updateUserIp(String phoneNumber, String userIp) {
         Person person = getUserByPhoneNumber(phoneNumber);
-        person.getUserIp().setIp(userIp);
+        person.getPersonIp().setIp(userIp);
         userRepo.save(person);
         return person.getId();
     }

@@ -100,7 +100,7 @@ public class ClientSocket {
     }
 
     public void sendTextMessageTo(String receiverIp, SocketModel socketModel) throws Exception {
-    public void sendTextMessageTo(String receiverIp, PersonMessage personMessage) throws Exception {
+        PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
         WebSocketSession session = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
         if (session != null) {
             try {
@@ -112,7 +112,7 @@ public class ClientSocket {
         }
             session.sendMessage(new TextMessage(socketModel.toJson()));
         }
-    }
+
 
 
 
