@@ -9,7 +9,7 @@ public class SocketModel implements Serializable {
 
     private String methodName;
     private String methodBody;
-    private String mac;
+    private String digitalSignature;
 
     public SocketModel(String methodName, String methodBody) {
         this.methodName = methodName;
@@ -24,8 +24,8 @@ public class SocketModel implements Serializable {
         this.methodBody = methodBody;
     }
 
-    public void setMac(String mac) {
-        this.mac = mac;
+    public void setDigitalSignature(String digitalSignature) {
+        this.digitalSignature = digitalSignature;
     }
 
     public String getMethodName() {
@@ -36,8 +36,8 @@ public class SocketModel implements Serializable {
         return methodBody;
     }
 
-    public String getMac(){
-        return mac;
+    public String getDigitalSignature(){
+        return digitalSignature;
     }
 
     public String toJson(){
@@ -53,7 +53,7 @@ public class SocketModel implements Serializable {
         return "SocketModel{" +
                 "methodName='" + methodName + '\'' +
                 ", methodBody='" + methodBody + '\'' +
-                ", mac='" + mac + '\'' +
+                ", mac='" + digitalSignature + '\'' +
                 '}';
     }
 }

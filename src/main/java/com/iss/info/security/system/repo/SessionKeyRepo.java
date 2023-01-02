@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface SessionKeyRepo extends JpaRepository<PersonSessionKey, Integer> {
 
-    @Query("SELECT ps.sessionKey FROM PersonSessionKey ps WHERE ps.person.id = :userId")
+    @Query("SELECT ps FROM PersonSessionKey ps WHERE ps.person.id = :userId")
     Optional<PersonSessionKey> getSessionKeyByUserId(int userId);
 
     @Modifying

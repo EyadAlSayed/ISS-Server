@@ -16,6 +16,14 @@ public class PersonSessionKey {
     @JoinColumn(name = "person_id")
     Person person;
 
+    public PersonSessionKey(int id, String key, Person person) {
+        this.id = id;
+        this. sessionKey = key;
+        this.person = person;
+    }
+
+    public PersonSessionKey(){}
+
     public int getId() {
         return id;
     }

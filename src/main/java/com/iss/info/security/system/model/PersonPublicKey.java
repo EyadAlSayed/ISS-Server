@@ -3,27 +3,26 @@ package com.iss.info.security.system.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = " person_sym_key")
-public class PersonSymmetricKey {
+@Table(name = "public_keys")
+public class PersonPublicKey {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    int id;
 
-    String symmetricKey;
+    String publicKey;
 
     @OneToOne
-    @JoinColumn(name = "person_sym_key")
+    @JoinColumn(name = "person_id")
     Person person;
 
-    public PersonSymmetricKey() {
+    public PersonPublicKey(int id, String userPublicKey, Person person) {
+        this.id = id;
+        this.person = person;
+        this.publicKey = userPublicKey;
     }
 
-    public PersonSymmetricKey(int id, String symmetricKey, Person person) {
-        this.id = id;
-        this.symmetricKey = symmetricKey;
-        this.person = person;
-    }
+    public PersonPublicKey(){}
 
     public int getId() {
         return id;
@@ -33,12 +32,12 @@ public class PersonSymmetricKey {
         this.id = id;
     }
 
-    public String getSymmetricKey() {
-        return symmetricKey;
+    public String getPublicKey() {
+        return publicKey;
     }
 
-    public void setSymmetricKey(String symmetricKey) {
-        this.symmetricKey = symmetricKey;
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 
     public Person getPerson() {

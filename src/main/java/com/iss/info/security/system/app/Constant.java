@@ -8,6 +8,8 @@ public class Constant {
 
     public final static String HANDSHAKING = "HANDSHAKING";
 
+    public final static String UPDATE_SESSION_KEY = "UPDATE_SESSION_KEY";
+
     public final static String SERVER_KEYS_FILE_NAME = "ServerKeys.bin";
     public final static String REG_IP = "REGIP";
     public final static String CHAT_SEND = "SEND";

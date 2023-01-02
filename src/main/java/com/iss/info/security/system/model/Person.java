@@ -38,15 +38,16 @@ public class Person implements Serializable {
     @JsonIgnoreProperties(value = "person")
     PersonIP personIp;
 
-    @OneToOne(mappedBy = "person",cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "person")
     @JsonIgnoreProperties(value = "person")
-    PersonSymmetricKey personSymKey;
+    PersonSessionKey personSessionKey;
+
+    @OneToOne(mappedBy = "person")
+    @JsonIgnoreProperties(value = "person")
+    PersonPublicKey personPublicKey;
 
     public Person() {
     }
-    @OneToOne(mappedBy = "person")
-    PersonSessionKey personSessionKey;
-
 
     public Person(int id, String name, String phoneNumber, String password) {
         this.id = id;
@@ -61,6 +62,18 @@ public class Person implements Serializable {
     }
     public PersonSessionKey getPersonSessionKey() {
         return personSessionKey;
+    }
+
+    public PersonPublicKey getPersonPublicKey() {
+        return personPublicKey;
+    }
+
+    public void setPersonSessionKey(PersonSessionKey personSessionKey) {
+        this.personSessionKey = personSessionKey;
+    }
+
+    public void setPersonPublicKey(PersonPublicKey personPublicKey) {
+        this.personPublicKey = personPublicKey;
     }
 
     public int getId() {
@@ -126,14 +139,6 @@ public class Person implements Serializable {
 
     public void setPersonIp(PersonIP personIp) {
         this.personIp = personIp;
-    }
-
-    public PersonSymmetricKey getPersonSymKey() {
-        return personSymKey;
-    }
-
-    public void setPersonSymKey(PersonSymmetricKey personSymKey) {
-        this.personSymKey = personSymKey;
     }
 
     public void setUserIp(PersonIP personIp) {

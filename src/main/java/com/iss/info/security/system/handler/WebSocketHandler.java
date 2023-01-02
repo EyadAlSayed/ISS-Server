@@ -60,7 +60,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         logger.info("Connection Closed With Device " + session.getRemoteAddress() + " for messages ..");
         clientSocket.removeClientSession(session);
-        sessionKeyService.deleteUserSessionKey(userService.getUserByIPAddress(session.getRemoteAddress().getAddress().getHostName()).getId());
+        //sessionKeyService.deleteUserSessionKey(userService.getUserByIPAddress(session.getRemoteAddress().getAddress().getHostName()).getId());
     }
 
     @Override
