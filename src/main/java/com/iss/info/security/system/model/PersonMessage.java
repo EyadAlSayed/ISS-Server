@@ -107,4 +107,15 @@ public class PersonMessage {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return "PersonMessage{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", fromUser='" + fromUser + '\'' +
+                ", toUser='" + toUser + '\'' +
+                ", sender='" + sender + '\'' +
+                ", person=" + person +
+                '}';
+    }
 }

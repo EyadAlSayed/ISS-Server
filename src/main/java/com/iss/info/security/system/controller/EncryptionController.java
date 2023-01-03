@@ -13,6 +13,7 @@ public class EncryptionController {
 
     @GetMapping("/server/handshaking")
     public String getServerPublicKey() throws IOException {
+        System.out.println("handshake -> serverPublicKey: " + getServerPublicKeyFromFile());
         return getServerPublicKeyFromFile();
     }
 }

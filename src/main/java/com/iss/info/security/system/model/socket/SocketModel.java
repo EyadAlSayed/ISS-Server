@@ -53,7 +53,7 @@ public class SocketModel implements Serializable {
         return "SocketModel{" +
                 "methodName='" + methodName + '\'' +
                 ", methodBody='" + methodBody + '\'' +
-                ", mac='" + digitalSignature + '\'' +
+                ", digitalSignature='" + digitalSignature + '\'' +
                 '}';
     }
 }

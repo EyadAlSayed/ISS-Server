@@ -10,6 +10,7 @@ public class PersonPublicKey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
+    @Column(length = 1000)
     String publicKey;
 
     @OneToOne
@@ -46,5 +47,14 @@ public class PersonPublicKey {
 
     public void setPerson(Person person) {
         this.person = person;
+    }
+
+    @Override
+    public String toString() {
+        return "PersonPublicKey{" +
+                "id=" + id +
+                ", publicKey='" + publicKey + '\'' +
+                ", person=" + person +
+                '}';
     }
 }
