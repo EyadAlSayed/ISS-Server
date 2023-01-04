@@ -10,6 +10,7 @@ public class PersonSessionKey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
+    @Column(length = 1000)
     String sessionKey;
 
     @OneToOne
@@ -46,5 +47,14 @@ public class PersonSessionKey {
 
     public void setPerson(Person person) {
         this.person = person;
+    }
+
+    @Override
+    public String toString() {
+        return "PersonSessionKey{" +
+                "id=" + id +
+                ", sessionKey='" + sessionKey + '\'' +
+                ", person=" + person +
+                '}';
     }
 }

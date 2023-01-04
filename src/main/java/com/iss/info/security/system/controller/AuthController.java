@@ -38,6 +38,7 @@ public class AuthController {
         person.setPassword(model.getPassword());
         person.setPersonSessionKey(new PersonSessionKey(0, model.getSessionKey(), person));
         person.setPersonPublicKey(new PersonPublicKey(0, model.getUserPublicKey(), person));
+        System.out.println("AuthController -> userEncryptedSessionKey: " + model.getSessionKey());
         personService.create(person);
 //        PersonSessionKey personSessionKey = new PersonSessionKey();
 //        personSessionKey.setPerson(person);

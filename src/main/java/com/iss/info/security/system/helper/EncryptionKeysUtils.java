@@ -28,8 +28,9 @@ public class EncryptionKeysUtils {
 //        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 //        publicKey = objectInputStream.readUTF();
 //        objectInputStream.close();
-////        return publicKey;
-        return InfoSecuritySystemApplication.serverKey;
+//        return publicKey;
+        System.out.println("getServerPublicKey: " + InfoSecuritySystemApplication.serverPublicKey);
+        return InfoSecuritySystemApplication.serverPublicKey;
     }
 
     public static String getServerPrivateKeyFromFile() throws IOException {
@@ -39,6 +40,8 @@ public class EncryptionKeysUtils {
 //        objectInputStream.readUTF();
 //        privateKey = objectInputStream.readUTF();
 //        objectInputStream.close();
-        return InfoSecuritySystemApplication.privateKey;
+//        return privateKey;
+        System.out.println("getServerPrivateKey: " + InfoSecuritySystemApplication.serverPrivateKey);
+        return InfoSecuritySystemApplication.serverPrivateKey;
     }
 }

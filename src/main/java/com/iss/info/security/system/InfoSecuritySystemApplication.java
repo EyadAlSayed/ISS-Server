@@ -10,11 +10,13 @@ import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.security.KeyPair;
 
+import static com.iss.info.security.system.helper.EncryptionConverters.convertByteToHexadecimal;
+
 @SpringBootApplication
 public class InfoSecuritySystemApplication {
 
-	public static String serverKey;
-	public  static String privateKey;
+	public static String serverPublicKey;
+	public static String serverPrivateKey;
 
 	public static void main(String[] args) throws Exception{
 		generateAndStoreServerKeys();
@@ -24,17 +26,15 @@ public class InfoSecuritySystemApplication {
 
 	private static void generateAndStoreServerKeys() throws Exception {
 		KeyPair keyPair = EncryptionKeysUtils.generateRSAKeyPair();
-
-		FileOutputStream fileOutputStream = new FileOutputStream(Constant.SERVER_KEYS_FILE_NAME);
-		ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-//		objectOutputStream.writeUTF(EncryptionConverters.convertByteToHexadecimal(keyPair.getPublic().getEncoded()));
-//		objectOutputStream.writeUTF(EncryptionConverters.convertByteToHexadecimal(keyPair.getPrivate().getEncoded()));
-		serverKey = EncryptionConverters.convertByteToHexadecimal(keyPair.getPublic().getEncoded());
-		privateKey = EncryptionConverters.convertByteToHexadecimal(keyPair.getPrivate().getEncoded());
-
-		System.out.println(serverKey.length());
-		System.out.println(privateKey.length());
-		objectOutputStream.close();
-
+//
+//		FileOutputStream fileOutputStream = new FileOutputStream(Constant.SERVER_KEYS_FILE_NAME);
+//		ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+//		objectOutputStream.writeUTF(convertByteToHexadecimal(keyPair.getPublic().getEncoded()));
+//		objectOutputStream.writeUTF(convertByteToHexadecimal(keyPair.getPrivate().getEncoded()));
+//		objectOutputStream.close();
+		serverPublicKey = convertByteToHexadecimal(keyPair.getPublic().getEncoded());
+		serverPrivateKey = convertByteToHexadecimal(keyPair.getPrivate().getEncoded());
+		System.out.println("serverPublicKey: " + serverPublicKey);
+		System.out.println("serverPrivateKey: " + serverPrivateKey);
 	}
 }

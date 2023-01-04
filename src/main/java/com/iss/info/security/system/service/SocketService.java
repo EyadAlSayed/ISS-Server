@@ -20,6 +20,7 @@ public class SocketService {
     }
 
     public void saveMessage(PersonMessage personMessage){
+        System.out.println("SocketService: saveMessage -> personMessage: " + personMessage);
         messageService.saveMessage(personMessage);
     }
 
