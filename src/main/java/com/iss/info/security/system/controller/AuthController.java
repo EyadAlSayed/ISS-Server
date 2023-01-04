@@ -32,7 +32,7 @@ public class AuthController {
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<?> signUp(@RequestBody SignupModel model, HttpServletRequest httpServletRequest) {
         Person person = new Person();
-        person.setPersonIp(new PersonIP(0,httpServletRequest.getRemoteAddr()));
+//        person.setPersonIp(new PersonIP(0,httpServletRequest.getRemoteAddr()));
         person.setName(model.getName());
         person.setPhoneNumber(model.getPhoneNumber());
         person.setPassword(model.getPassword());

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -62,11 +63,10 @@ public class ClientSocket {
     }
 
     public void filterAndForwardMessage(SocketModel socketModel, String userIp) throws Exception {
-        PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
         switch (socketModel.getMethodName().toUpperCase()) {
             case CHAT_SEND:
             case CHAT_RECEIVED: {
-                sendVerifiedMessage(socketModel);
+                sendAndReceiveFilter(socketModel);
                 break;
             }
             case CHAT_SEND_E:
@@ -87,6 +87,7 @@ public class ClientSocket {
 //            }
 
             case HANDSHAKING:{
+                PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
                 Person person = personService.getPersonByPhoneNumber(personMessage.getFromUser());
                 if(sessionKeyService.getSessionKeyByUserId(person.getId()) == null) {
                     PersonSessionKey personSessionKey = new PersonSessionKey();
@@ -100,6 +101,7 @@ public class ClientSocket {
             }
 
             case STORING:{
+                PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
                 Person person = personService.getPersonByPhoneNumber(personMessage.getFromUser());
                 if(publicKeyService.getPublicKeyByUserId(person.getId()) == null) {
                     PersonPublicKey personPublicKey = new PersonPublicKey();
@@ -144,17 +146,6 @@ public class ClientSocket {
             session.sendMessage(new TextMessage(socketModel.toJson()));
         }
     }
-
-
-
-
-
-
-
-
-
-
-
     private void sendVerifiedMessage(SocketModel socketModel) throws Exception {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
         Person toPerson = personService.getPersonByPhoneNumber(personMessage.getToUser());
@@ -162,7 +153,7 @@ public class ClientSocket {
         String receiverIp = toPerson.getPersonIp().getIp();
         String senderIp = fromPerson.getPersonIp().getIp();
 
-        WebSocketSession receiverSession = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
+        WebSocketSession receiverSession = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(senderIp)).findFirst().orElse(null);
         try {
             if (verified(socketModel)) sendTextEncryptedMessage(socketModel, receiverSession);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
@@ -225,7 +216,7 @@ public class ClientSocket {
     private boolean verified(SocketModel socketModel) throws Exception {
         //todo: digital signature.
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
-        return verifyDigitalSignature(hexStringToByteArray(personMessage.getContent())
+        return verifyDigitalSignature(DatatypeConverter.parseHexBinary(personMessage.getContent())
         , hexStringToByteArray(socketModel.getDigitalSignature())
         , retrievePublicKey(publicKeyService.getPublicKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()))); //fixme: ...
     }

@@ -1,5 +1,6 @@
 package com.iss.info.security.system.helper;
 
+import com.iss.info.security.system.InfoSecuritySystemApplication;
 import com.iss.info.security.system.app.Constant;
 
 import java.io.FileInputStream;
@@ -22,21 +23,22 @@ public class EncryptionKeysUtils {
     }
 
     public static String getServerPublicKeyFromFile() throws IOException {
-        String publicKey;
-        FileInputStream fileInputStream = new FileInputStream(Constant.SERVER_KEYS_FILE_NAME);
-        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-        publicKey = objectInputStream.readUTF();
-        objectInputStream.close();
-        return publicKey;
+//        String publicKey;
+//        FileInputStream fileInputStream = new FileInputStream(Constant.SERVER_KEYS_FILE_NAME);
+//        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+//        publicKey = objectInputStream.readUTF();
+//        objectInputStream.close();
+////        return publicKey;
+        return InfoSecuritySystemApplication.serverKey;
     }
 
     public static String getServerPrivateKeyFromFile() throws IOException {
-        String privateKey;
-        FileInputStream fileInputStream = new FileInputStream(Constant.SERVER_KEYS_FILE_NAME);
-        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-        objectInputStream.readUTF();
-        privateKey = objectInputStream.readUTF();
-        objectInputStream.close();
-        return privateKey;
+//        String privateKey;
+//        FileInputStream fileInputStream = new FileInputStream(Constant.SERVER_KEYS_FILE_NAME);
+//        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+//        objectInputStream.readUTF();
+//        privateKey = objectInputStream.readUTF();
+//        objectInputStream.close();
+        return InfoSecuritySystemApplication.privateKey;
     }
 }

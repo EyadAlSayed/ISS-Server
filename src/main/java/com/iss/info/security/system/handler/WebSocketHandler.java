@@ -69,30 +69,4 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         logger.info("Received Message  :" + SocketModel.fromJson(message));
         clientSocket.filterAndForwardMessage(SocketModel.fromJson(message), session.getRemoteAddress().getHostName());
     }
-
-//
-//    private void filterMessageAndSend(SocketModel socketModel) throws Exception {
-//        PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
-//        switch (socketModel.getMethodName().toUpperCase()) {
-//            case CHAT_SEND: {
-//                personMessage.setContent(decryptMessage(personMessage));
-//                clientSocket.sendTextMessageTo(socketService.getChatIpByPhoneNumber(personMessage.getToUser()), socketModel);
-//                break;
-//            }
-//            case HANDSHAKING: {
-//                if (sessionKeyService.getSessionKeyByUserId(userService.getUserByPhoneNumber(personMessage.getFromUser()).getId()) == null) {
-//                    addUserSessionKeyToDB(userService.getUserByPhoneNumber(personMessage.getFromUser()), personMessage.getContent());
-//                } else {
-//                    sessionKeyService.updateUserSessionKey(userService.getUserByPhoneNumber(personMessage.getFromUser()).getId(), personMessage.getContent());
-//                }
-//                //todo: send confirmation message to client.
-//                break;
-//            }
-//            default:
-//                break;
-//        }
-//    }
-
-    // decrypts the received message using sender's session key.
-
 }
