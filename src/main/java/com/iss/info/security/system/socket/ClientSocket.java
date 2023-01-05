@@ -111,6 +111,8 @@ public class ClientSocket {
         String receiverIp = toPerson.getPersonIp().getIp();
         String senderIp = fromPerson.getPersonIp().getIp();
 
+        System.out.println("Message : " + personMessage.getContent());
+
         WebSocketSession receiverSession = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
         try {
             if (verified(socketModel)) sendTextEncryptedMessage(socketModel, receiverSession);
