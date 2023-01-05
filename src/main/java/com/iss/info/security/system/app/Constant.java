@@ -14,6 +14,8 @@ public class Constant {
     public final static String REG_IP = "REGIP";
     public final static String CHAT_SEND = "SEND";
     public final static String CHAT_SEND_E = "SEND_E";
+    public final static String CHAT_SEND_D = "SEND_D";
+    public final static String CHAT_RECEIVED_D = "CHAT_REC_D";
 
     public final static String CHAT_RECEIVED = "CHAT_REC";
     public final static String CHAT_RECEIVED_E = "CHAT_REC_E";

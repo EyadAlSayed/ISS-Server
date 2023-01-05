@@ -7,6 +7,7 @@ import com.iss.info.security.system.model.PersonMessage;
 import com.iss.info.security.system.service.MessageService;
 import com.iss.info.security.system.service.PersonContactService;
 import com.iss.info.security.system.service.PersonService;
+import com.iss.info.security.system.service.SessionKeyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,14 +59,20 @@ public class UserController {
 
     @PostMapping("/createContact")
     public ResponseEntity<?> createContact(@RequestParam("userId") int userId, @RequestBody PersonContact personContact) {
-
         if (userId == 0) return ResponseEntity.badRequest().body("bad Request");
-
         if (!personService.isPhoneNumberExist(personContact.getPhoneNumber())) return ResponseEntity.notFound().build();
-
         Person person = personService.getPersonById(userId);
         personContact.setPerson(person);
         personContactService.create(personContact);
         return ResponseEntity.ok("successfully");
+    }
+
+    @GetMapping("/updatekeys")
+    public ResponseEntity<?> updateSession(@RequestParam("userId") int userId,@RequestParam("session") String session,@RequestParam("public")String publicKey){
+        Person person = personService.getPersonById(userId);
+        person.getPersonPublicKey().setPublicKey(publicKey);
+        person.getPersonSessionKey().setSessionKey(session);
+        personService.update(person);
+     return ResponseEntity.ok("sucessful");
     }
 }

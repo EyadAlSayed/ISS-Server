@@ -2,6 +2,7 @@ package com.iss.info.security.system.socket;
 
 import com.iss.info.security.system.helper.DigitalSignatureTools;
 import com.iss.info.security.system.helper.EncryptionKeysUtils;
+import com.iss.info.security.system.helper.SymmetricEncryptionTools;
 import com.iss.info.security.system.model.Person;
 import com.iss.info.security.system.model.PersonMessage;
 import com.iss.info.security.system.model.PersonPublicKey;
@@ -49,6 +50,7 @@ public class ClientSocket {
     @Autowired
     MessageService messageService;
 
+
     public List<WebSocketSession> getSessions() {
         return sessions;
     }
@@ -62,34 +64,25 @@ public class ClientSocket {
     }
 
     public void filterAndForwardMessage(SocketModel socketModel, String userIp) throws Exception {
-        System.out.println("ClientSocket: filterAndForwardMessage: " + socketModel);
         switch (socketModel.getMethodName().toUpperCase()) {
             case CHAT_SEND:
             case CHAT_RECEIVED: {
-                sendVerifiedMessage(socketModel);
+                sendAndReceiveFilter(socketModel);
                 break;
             }
             case CHAT_SEND_E:
             case CHAT_RECEIVED_E: {
+                sendVerifiedMacMessage(socketModel);
+                break;
+            }
+            case CHAT_SEND_D:
+            case CHAT_RECEIVED_D:{
                 sendVerifiedMessage(socketModel);
-                break;
             }
-            case REG_IP: {
-                String phoneNumber = socketModel.getMethodBody();
-//                socketService.updatePersonIp(phoneNumber, userIp);
-                break;
-            }
-
-//            case UPDATE_SESSION_KEY: {
-//                Person fromPerson = personService.getPersonByPhoneNumber(personMessage.getFromUser());
-//                if(fromPerson != null)
-//                    sessionKeyService.updateUserSessionKey(fromPerson.getId(), personMessage.getContent());
-//            }
-
-            case HANDSHAKING:{
+            case HANDSHAKING: {
                 PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
                 Person person = personService.getPersonByPhoneNumber(personMessage.getFromUser());
-                if(sessionKeyService.getSessionKeyByUserId(person.getId()) == null) {
+                if (sessionKeyService.getSessionKeyByUserId(person.getId()) == null) {
                     PersonSessionKey personSessionKey = new PersonSessionKey();
                     personSessionKey.setPerson(person);
                     personSessionKey.setSessionKey(decryptSessionKey(personMessage.getContent()));
@@ -100,10 +93,10 @@ public class ClientSocket {
                 break;
             }
 
-            case STORING:{
+            case STORING: {
                 PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
                 Person person = personService.getPersonByPhoneNumber(personMessage.getFromUser());
-                if(publicKeyService.getPublicKeyByUserId(person.getId()) == null) {
+                if (publicKeyService.getPublicKeyByUserId(person.getId()) == null) {
                     PersonPublicKey personPublicKey = new PersonPublicKey();
                     personPublicKey.setPerson(person);
                     personPublicKey.setPublicKey(personMessage.getContent());
@@ -118,14 +111,10 @@ public class ClientSocket {
         }
     }
 
-    private String decryptSessionKey(String encryptedSessionKey){
-        try {
-            return do_RSADecryption(hexStringToByteArray(encryptedSessionKey), retrievePrivateKey(getServerPrivateKeyFromFile()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+
+    /**
+     * for step 1 and 2
+     */
 
     public void sendAndReceiveFilter(SocketModel socketModel) {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
@@ -148,14 +137,9 @@ public class ClientSocket {
     }
 
 
-
-
-
-
-
-
-
-
+    /**
+     * for step  1 and 3 and 4
+     */
 
     private void sendVerifiedMessage(SocketModel socketModel) throws Exception {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
@@ -166,21 +150,40 @@ public class ClientSocket {
 
         WebSocketSession receiverSession = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
         try {
-            if (verified(socketModel)) sendTextEncryptedMessage(socketModel, receiverSession);
+            if ( verified(socketModel)) sendTextEncryptedMessage(socketModel, receiverSession);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
 
         try {
             WebSocketSession senderSession = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(senderIp)).findFirst().orElse(null);
-            senderSession.sendMessage(new TextMessage(new SocketModel(CHAT_RECEIVED_E,encryptMessage(personMessage, "message sent")).toJson()));
+            senderSession.sendMessage(new TextMessage(new SocketModel(CHAT_RECEIVED_E, encryptMessage(personMessage, "message sent")).toJson()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+    private void sendVerifiedMacMessage(SocketModel socketModel) throws Exception {
+        PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
+        Person toPerson = personService.getPersonByPhoneNumber(personMessage.getToUser());
+        Person fromPerson = personService.getPersonByPhoneNumber(personMessage.getFromUser());
+        String receiverIp = toPerson.getPersonIp().getIp();
+        String senderIp = fromPerson.getPersonIp().getIp();
+
+        WebSocketSession receiverSession = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(receiverIp)).findFirst().orElse(null);
+        sendTextEncryptedMessage(socketModel, receiverSession);
+
+
+        try {
+            WebSocketSession senderSession = sessions.stream().filter(it -> it.getRemoteAddress().getAddress().getHostName().equals(senderIp)).findFirst().orElse(null);
+            senderSession.sendMessage(new TextMessage(new SocketModel(CHAT_RECEIVED_E, encryptMessage(personMessage, "message sent")).toJson()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    private String encryptMessage(PersonMessage personMessage, String message){
+    private String encryptMessage(PersonMessage personMessage, String message) {
         try {
             return convertByteToHexadecimal(do_AESEncryption(message
                     , retrieveSymmetricSecretKey(sessionKeyService.getSessionKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()))));
@@ -193,7 +196,6 @@ public class ClientSocket {
     public void sendTextEncryptedMessage(SocketModel socketModel, WebSocketSession session) {
         try {
             PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
-            System.out.println("ClientSocket -> sendTextEncryptedMessage -> personMessage: " + personMessage);
             saveDecryptedSentMessage(personMessage);
             sendEncryptedMessage(session, socketModel);
         } catch (Exception ignore) {
@@ -203,47 +205,49 @@ public class ClientSocket {
 
     private void sendEncryptedMessage(WebSocketSession session, SocketModel socketModel) throws Exception {
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
-        System.out.println("ClientSocket -> sendEncryptedMessage -> personMessage: " + personMessage);
         String decryptedMessage = decryptionMessage(personMessage);
-        System.out.println("ClientSocket -> sendEncryptedMessage -> decryptedMessage: " + decryptedMessage);
-        System.out.println("ClientSocket -> sendEncryptedMessage -> toUser sessionKey : " + sessionKeyService.getSessionKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getToUser()).getId()));
         personMessage.setContent(convertByteToHexadecimal(do_AESEncryption(decryptedMessage
                 , retrieveSymmetricSecretKey(sessionKeyService.getSessionKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getToUser()).getId())))));
         socketModel.setMethodBody(personMessage.toJson());
-        System.out.println("ClientSocket -> sendEncryptedMessage -> personMessageAfterEncryptingMessage: " + personMessage);
         session.sendMessage(new TextMessage(socketModel.toJson()));
     }
 
     private String decryptionMessage(PersonMessage personMessage) {
         try {
-            System.out.println("ClientSocket -> decryptionMessage -> sessionKey: " + sessionKeyService.getSessionKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()));
-            System.out.println("ClientSocket -> decryptionMessage -> personMessage: " + personMessage);
-            System.out.println("ClientSocket -> decryptionMessage: " + do_AESDecryption(hexStringToByteArray(personMessage.getContent())
-                    , retrieveSymmetricSecretKey(sessionKeyService.getSessionKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()))));
+            retrieveSymmetricSecretKey(sessionKeyService.getSessionKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()));
             return do_AESDecryption(hexStringToByteArray(personMessage.getContent())
                     , retrieveSymmetricSecretKey(sessionKeyService.getSessionKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId())));
         } catch (Exception e) {
             return null;
         }
     }
+
+    private String decryptSessionKey(String encryptedSessionKey) {
+        try {
+            return do_RSADecryption(hexStringToByteArray(encryptedSessionKey), retrievePrivateKey(getServerPrivateKeyFromFile()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private void saveDecryptedSentMessage(PersonMessage personMessage) throws Exception {
-        System.out.println("ClientSocket -> saveDecryptedSentMessage -> personMessage: " + personMessage);
         personMessage.setContent(do_AESDecryption(hexStringToByteArray(personMessage.getContent()),
                 retrieveSymmetricSecretKey(sessionKeyService.getSessionKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()))));
-        System.out.println("ClientSocket -> saveDecryptedSentMessage -> sessionKey: " + sessionKeyService.getSessionKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()));
-        System.out.println("ClientSocket -> saveDecryptedSentMessage -> personMessageAfterDecryptingContent: " + personMessage);
         //personMessage.setPerson(personService.getPersonByPhoneNumber(personMessage.getFromUser()));
         messageService.saveMessage(personMessage);
     }
 
     private boolean verified(SocketModel socketModel) throws Exception {
-        //todo: digital signature.
         PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
-        System.out.println("ClientSocket: verified: personMessage: " + personMessage);
-        System.out.println("ClientSocket: verified: userPublicKey: " + publicKeyService.getPublicKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()));
-        System.out.println("ClientSocket: verified: user: " + personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId());
         return verifyDigitalSignature(hexStringToByteArray(personMessage.getContent())
-        , hexStringToByteArray(socketModel.getDigitalSignature())
-        , retrievePublicKey(publicKeyService.getPublicKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()))); //fixme: ...
+                , hexStringToByteArray(socketModel.getDigitalSignature())
+                , retrievePublicKey(publicKeyService.getPublicKeyByUserId(personService.getPersonByPhoneNumber(personMessage.getFromUser()).getId()))); //fixme: ...
+    }
+    private boolean verifiedMac(SocketModel socketModel) throws NoSuchAlgorithmException, InvalidKeyException {
+        PersonMessage personMessage = PersonMessage.fromJson(socketModel.getMethodBody());
+        return socketModel.getMac()
+                .equals(SymmetricEncryptionTools.getMac(personService.getSymmetricKeyByPhoneNumber(personMessage.getFromUser())
+                        , personMessage.getContent()));
     }
 }

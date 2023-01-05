@@ -27,4 +27,15 @@ public class SignupModel {
     public String getUserPublicKey() {
         return userPublicKey;
     }
+
+    @Override
+    public String toString() {
+        return "SignupModel{" +
+                "name='" + name + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", password='" + password + '\'' +
+                ", sessionKey='" + sessionKey + '\'' +
+                ", userPublicKey='" + userPublicKey + '\'' +
+                '}';
+    }
 }

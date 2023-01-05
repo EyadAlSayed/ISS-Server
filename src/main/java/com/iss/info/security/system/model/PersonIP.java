@@ -15,7 +15,6 @@ public class PersonIP {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(unique = true)
     private String ip;
 
     @OneToOne(cascade = CascadeType.ALL)

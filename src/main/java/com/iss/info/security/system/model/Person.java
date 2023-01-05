@@ -38,11 +38,11 @@ public class Person implements Serializable {
     @JsonIgnoreProperties(value = "person")
     PersonIP personIp;
 
-    @OneToOne(mappedBy = "person")
+    @OneToOne(mappedBy = "person",cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = "person")
     PersonSessionKey personSessionKey;
 
-    @OneToOne(mappedBy = "person")
+    @OneToOne(mappedBy = "person",cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = "person")
     PersonPublicKey personPublicKey;
 

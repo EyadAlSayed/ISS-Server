@@ -11,6 +11,8 @@ public class SocketModel implements Serializable {
     private String methodBody;
     private String digitalSignature;
 
+    private String  mac;
+
     public SocketModel(String methodName, String methodBody) {
         this.methodName = methodName;
         this.methodBody = methodBody;
@@ -46,6 +48,14 @@ public class SocketModel implements Serializable {
 
     public static SocketModel fromJson(TextMessage textMessage){
         return new Gson().fromJson(textMessage.getPayload(),SocketModel.class);
+    }
+
+    public String getMac() {
+        return mac;
+    }
+
+    public void setMac(String mac) {
+        this.mac = mac;
     }
 
     @Override

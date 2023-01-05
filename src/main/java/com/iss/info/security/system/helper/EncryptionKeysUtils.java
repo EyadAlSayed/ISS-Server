@@ -13,7 +13,7 @@ import java.security.SecureRandom;
 public class EncryptionKeysUtils {
 
     public static KeyPair generateRSAKeyPair() throws Exception {
-        SecureRandom secureRandom = new SecureRandom();
+        SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
 
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 
@@ -29,7 +29,6 @@ public class EncryptionKeysUtils {
 //        publicKey = objectInputStream.readUTF();
 //        objectInputStream.close();
 //        return publicKey;
-        System.out.println("getServerPublicKey: " + InfoSecuritySystemApplication.serverPublicKey);
         return InfoSecuritySystemApplication.serverPublicKey;
     }
 
@@ -41,7 +40,6 @@ public class EncryptionKeysUtils {
 //        privateKey = objectInputStream.readUTF();
 //        objectInputStream.close();
 //        return privateKey;
-        System.out.println("getServerPrivateKey: " + InfoSecuritySystemApplication.serverPrivateKey);
         return InfoSecuritySystemApplication.serverPrivateKey;
     }
 }

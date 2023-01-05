@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Base64;
 import java.util.List;
 
 import static com.iss.info.security.system.helper.EncryptionConverters.*;
@@ -36,18 +37,21 @@ public class PersonService {
     private PublicKeyService publicKeyService;
 
 
+    public void  update(Person person){
+        personRepo.save(person);
+    }
     public void create(Person person) {
         PersonIP pIp = person.getPersonIp();
-        //PersonSymmetricKey personSymmetricKey = person.getPersonSymKey();
-        PersonSessionKey personSessionKey = person.getPersonSessionKey();
-        personSessionKey.setSessionKey(decryptSessionKey(person.getPersonSessionKey().getSessionKey()));
         PersonPublicKey personPublicKey = person.getPersonPublicKey();
+        PersonSessionKey personSessionKey = person.getPersonSessionKey();
+        personSessionKey.setSessionKey(decryptRSASessionKey(person.getPersonSessionKey().getSessionKey()));
+
         person.setPersonIp(null);
         person.setPersonSessionKey(null);
         person.setPersonPublicKey(null);
         Person p = personRepo.save(person);
+
         pIp.setPerson(p);
-        //personSymmetricKey.setPerson(p);
         personSessionKey.setPerson(p);
         personPublicKey.setPerson(p);
         personIpService.create(pIp);
@@ -55,15 +59,19 @@ public class PersonService {
         publicKeyService.addUserPublicKey(personPublicKey);
     }
 
-    private String decryptSessionKey(String sessionKey){
+
+    private String decryptRSASessionKey(String sessionKey){
         try {
-            PrivateKey privateKey = retrievePrivateKey(InfoSecuritySystemApplication.serverPrivateKey);
-            System.out.println("PersonService -> decryptSession -> privateKey: " + InfoSecuritySystemApplication.serverPrivateKey);
-            return do_RSADecryption(hexStringToByteArray(sessionKey), privateKey);
-        } catch (Exception e) {
+            return  do_RSADecryption(hexStringToByteArray(sessionKey),InfoSecuritySystemApplication.keyPair.getPrivate());
+
+        }catch (Exception e){
             e.printStackTrace();
-            return null;
         }
+        return "";
+
+    }
+    private String decryptSessionKey(String sessionKey){
+        return new String(Base64.getDecoder().decode(sessionKey));
     }
 
 
