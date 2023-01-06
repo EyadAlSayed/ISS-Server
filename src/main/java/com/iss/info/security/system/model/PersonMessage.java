@@ -1,7 +1,10 @@
 package com.iss.info.security.system.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import com.google.gson.Gson;
+
 
 import javax.persistence.*;
 
@@ -19,22 +22,23 @@ public class PersonMessage {
 
     private String toUser;
 
-    private int type;
+    private String sender;
 
-    @ManyToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name = "person_id",nullable = false, referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "person_id", nullable = false, referencedColumnName = "id")
     @JsonIgnoreProperties(value = "personMessages", allowSetters = true)
+    @JsonBackReference
     private Person person;
 
     public PersonMessage() {
     }
 
-    public PersonMessage(int id, String content, String fromUser, String toUser, int type) {
+    public PersonMessage(int id, String content, String fromUser, String toUser, String sender) {
         this.id = id;
         this.content = content;
         this.fromUser = fromUser;
         this.toUser = toUser;
-        this.type = type;
+        this.sender = sender;
     }
 
     public int getId() {
@@ -69,32 +73,49 @@ public class PersonMessage {
         this.toUser = toUser;
     }
 
-
-
-    public int getType() {
-        return type;
+    public String getSender() {
+        return sender;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
-    public Person getUser() {
+    public Person getPerson() {
         return person;
     }
 
-    public void setUser(Person person) {
+    public void setPerson(Person person) {
         this.person = person;
     }
 
-    public static PersonMessage fromJson(String json){
+    public static PersonMessage fromJson(String json) {
         try {
             return new Gson().fromJson(json, PersonMessage.class);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
+    public String toJson() {
+        try {
+            return new Gson().toJson(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return "PersonMessage{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", fromUser='" + fromUser + '\'' +
+                ", toUser='" + toUser + '\'' +
+                ", sender='" + sender + '\'' +
+                ", person=" + person +
+                '}';
+    }
 }

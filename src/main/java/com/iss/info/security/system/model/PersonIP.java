@@ -1,5 +1,10 @@
 package com.iss.info.security.system.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -12,8 +17,9 @@ public class PersonIP {
 
     private String ip;
 
-    @OneToOne
-    @JoinColumn(name = "person_id", nullable = true)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "person_id")
+    @JsonIgnoreProperties(value = "personIp", allowSetters = true)
     Person person;
 
 
@@ -45,4 +51,11 @@ public class PersonIP {
         this.ip = ip;
     }
 
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
 }
